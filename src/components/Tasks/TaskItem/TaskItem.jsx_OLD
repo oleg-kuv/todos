@@ -1,0 +1,151 @@
+import React from 'react';
+import './style.scss'
+
+export default class TaskItem extends React.Component{
+   constructor (props) {
+      super  ( props )
+      this.state = {
+         id: props.id,
+         title: props.title || '',
+         placeholder: props.placeholder || '',
+         completed: props.completed || false,
+         edit: props.edit || false, 
+         bufferTitle: props.title || '',
+         removed: false,
+         newAdder: props.newAdder || false,
+         new: props.new || false,
+      }
+
+      const inputTitle=<input type="text" name={"task_"+this.props.id} />
+      this.onChangeTitle = this.onChangeTitle.bind(this)
+      this.clickEditTitle = this.clickEditTitle.bind(this)
+      this.keyHandler = this.keyHandler.bind(this)
+      this.removeHandler = this.removeHandler.bind(this)
+
+   }
+
+   componentDidMount() {
+      if ( this.state.new ) {
+         setTimeout ( () => {
+            console.log ('componentDidUpdate()', this.state.id, this.state.title, 'new', this.state.new)
+            this.setState ({ ...this.state, new: false })
+         }, 10 )
+      }
+   }
+   componentDidUpdate() {
+      // Режим редактирования пункта
+      if ( this.state.edit ) {
+         console.log ('edit mode')
+
+      } else {
+         console.log ('read mode')
+      }
+
+      // если заголовок элемента пуст - удалить элемент
+      if ( this.state.title === '' && !this.state.removed ) {
+         this.removeHandler()
+      }
+      
+      // если элемент удален
+      if ( this.state.removed ) {
+         setTimeout ( () => this.props.removeHandler(this.state.id), 400 )
+      }
+      return true
+   }
+
+   completeClick() {
+      this.setState( {...this.state, completed: !this.state.completed} )
+   }
+
+   toggleEditMode(callBack) { 
+      this.setState( {...this.state, edit: !this.state.edit}, callBack )
+   }
+
+   setEditMode(mode, callBack = () => {return true}) {
+      if (mode === undefined) {console.error ('setEditMode ( mode=? ....'); return false}
+      this.setState ( {...this.state, edit: mode, callBack} )
+   }
+
+   clickEditTitle() {
+      this.toggleEditMode ( () => {
+         if ( this.state.edit ) {
+            // заполнение буфера текущим значением и переход в режим редактирования
+            this.setState ({...this.state, bufferTitle: this.state.title})
+         } else {
+            // сохранние результата и выход из режима редактирования
+            if ( this.state.bufferTitle !== this.state.title )
+               // если элмемент помечен как newAdder, то добавить данный state в общий список, а
+               // данный элемент очистить
+               // Иначе просто сохранить стейт
+               if ( this.state.newAdder ) {
+                  //console.log (this.props)
+                  //this.props.addHandler(this.state)
+               }
+               else this.setState ({...this.state, title: this.state.bufferTitle})
+         }
+      } )
+   }
+
+   keyHandler(e) {
+       if ( e.key === 'Enter' ) this.clickEditTitle()
+       if ( e.key === 'Escape' ) {
+          this._toggleEditState ( () => {
+            this.setState ({...this.state, bufferTitle: this.state.title})
+          } )
+       }
+   }
+
+   onChangeTitle(e) {
+      this.setState({...this.state, bufferTitle: e.target.value})
+   }
+
+   removeHandler () {
+      if (!this.state.newAdder)
+         this.setState({...this.state, removed: true})
+   }
+
+   render () {
+      const edit_classMidifier=this.state.edit ? ' taskItem__edit' : ''
+      const completed_classModifier=this.state.completed ? ' taskItem__completed' : ' taskItem__non-completed'
+      const removed_classModifier=this.state.removed ? ' taskItem__removed' : ''
+      const newAdder_classModifier=this.state.newAdder ? ' taskItem__newAdder' : ''
+      const new_classModifier=this.state.new ? ' taskItem__new' : ''
+
+      const completedSymbol=this.state.completed ? '✔️' : "🛠️"
+      const titleText = !this.state.title && this.state.placeholder
+         ? this.state.placeholder
+         : this.state.title
+
+      const title=this.state.edit
+         ? <input type="text" 
+                  name={'task_'+this.state.id} 
+                  value={this.state.bufferTitle} 
+                  onChange={this.onChangeTitle} 
+                  onKeyDown={this.keyHandler}
+                  placeholder={this.state.placeholder}
+                  autoFocus
+           />
+         : titleText
+
+      return <div className={"taskItem"+completed_classModifier+edit_classMidifier+removed_classModifier+newAdder_classModifier+new_classModifier} id={'task_'+this.state.id}>
+         <div className="state" onClick={this.completeClick.bind(this)}>{completedSymbol}</div>
+         <div className="edit" onClick={this.clickEditTitle}>✏️</div>
+         <div className="remove" onClick={this.removeHandler}>✖️</div>
+         <div className="taskTitle" >{title}</div>
+
+      </div>
+   }
+}
+
+export const AddTaskItem = class extends TaskItem {
+   constructor (props) {
+      super (props)
+      this.state = {
+         ...this.state,
+         id: 'addNew',
+         placeholder: props.placeholder,
+
+      }
+      console.log ("adder", this.state)
+   }
+}

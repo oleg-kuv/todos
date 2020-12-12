@@ -1,0 +1,123 @@
+$editBkgColor: #a2b8e1;
+$removeBkgColor: #f4a6a6;
+$completedBkgColor: #79ea80;
+$non-completedBkgColor: #ffda93;
+
+$colorCoeff: 30;
+$pressedColorCoeff: 45%;
+
+.edit {
+   background: $editBkgColor;
+   &:hover {background: $editBkgColor - $colorCoeff;}
+}
+
+.remove {
+   background: $removeBkgColor;
+   &:hover {background: $removeBkgColor - $colorCoeff;}
+}
+
+.state, .edit, .remove { 
+   cursor: pointer;
+   transition: background .1s ease-in-out;
+   text-shadow: 3px 3px 10px #0000004d;
+   box-sizing: border-box;
+   max-height: 40px;
+   max-width: 40px;
+   height: 100%; 
+   width: 100%;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+
+   &:hover {}
+   img {
+      width: 25px;
+      height: 25px;
+   }
+}
+
+.taskTitle {
+   flex-grow: 1;
+   display: flex;
+   align-items: center;
+   justify-content: flex-start;
+   font-size: 15px;
+   text-align: left;
+
+   input[type=text] {
+      flex-grow: 1;
+      border: none;
+      width: 100%;
+      font-style: italic;
+      font-size: 15px;
+      outline: none;
+      color: #7801ee;
+      text-shadow: 0 0 1px #0000003d;
+   }
+}
+.inputText {
+   flex-grow: 1;
+   text-align: left;
+}
+.taskItem {
+   display: flex;
+   flex-direction: row;
+   max-width: 600px;
+   width: 100%;
+   margin: 10px;
+   box-shadow: 0px 0px 14px 0px #0000002e;
+   max-height: 600px;
+   height: auto;
+   overflow: hidden;
+   transition: 
+               max-height .1s ease-in-out,
+               margin     .1s ease-in-out,
+               opacity    .1s ease-in-out;
+
+   & > * {
+      padding: 5px;
+   }
+   &__non-completed {
+      .state {
+         //content: "\2610";
+         background: $non-completedBkgColor;
+         &:hover {background: $non-completedBkgColor - $colorCoeff;}
+      }
+   }
+   &__completed {
+      .state {
+         background: $completedBkgColor;
+         &:hover {background: $completedBkgColor - $colorCoeff;}
+      }
+   }
+
+   &__edit {
+      .edit {background: $editBkgColor - $pressedColorCoeff;}
+   }
+
+   &__removed, &__new {
+      max-height: 0;
+      margin-top: 0;
+      margin-bottom: 0;
+      opacity: .3;
+
+      .remove {background: $removeBkgColor - $pressedColorCoeff;}
+   }
+
+   &__newAdder {
+      margin-top: 40px;
+      .remove { background: #ccc }
+   }
+/*   
+   &__new {
+      height: 0;
+      margin: 0;
+   }
+*/
+   &:hover {
+      .taskTitle {
+
+      }
+   }
+}
+
